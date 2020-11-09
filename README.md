@@ -12,7 +12,7 @@ Sorry for tests (1.0-SNAPSHOT). It's into next release.
         @Get(path = "/{content}")
         Flux<Models> sendGetRequest(
             @Path(name = "content") String content,
-            @Query(name = "omg") String omg
+            @Query(name = "size") String size
         );
 
         @Post(path = "/{content}")
@@ -24,5 +24,5 @@ Sorry for tests (1.0-SNAPSHOT). It's into next release.
     }
     
     IProxyInter pi = Arthas.builder().target(IProxyInter.class);
-    Flux<Models> result = pi.sendGetRequest("ololo", "dsadsadasdasd232131231231231");
+    Flux<Models> result = pi.sendGetRequest("some path", "some data");
     Mono<Models> result1 = pi.sendPostRequest("model", new Models(1, "some data"));
