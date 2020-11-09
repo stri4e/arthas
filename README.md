@@ -12,7 +12,7 @@ Sorry for tests (1.0-SNAPSHOT). It's into next release.
         @Get(path = "/{content}")
         Flux<Models> sendGetRequest(
             @Path(name = "content") String content,
-            @Query(name = "size") String size
+            @Query(name = "size") Integer size
         );
 
         @Post(path = "/{content}")
