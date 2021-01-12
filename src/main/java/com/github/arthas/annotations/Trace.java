@@ -11,4 +11,6 @@ public @interface Trace {
 
     String path() default "";
 
+    Header[] headers() default {};
+
 }

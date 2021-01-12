@@ -7,13 +7,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-@Target({ElementType.METHOD})
+@Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
-@BaseMethod(method = HttpMethod.HEAD)
-public @interface Head {
-
-    String path() default "";
-
-    Header[] headers() default {};
-
+public @interface BaseMethod {
+    HttpMethod method();
 }
