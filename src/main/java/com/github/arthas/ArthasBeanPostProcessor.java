@@ -33,8 +33,6 @@ public class ArthasBeanPostProcessor implements BeanPostProcessor {
         Object proxy = this.getTargetObject(bean);
         Arthas r = AnnotationUtils.findAnnotation(bean.getClass(), Arthas.class);
         if (r != null) {
-            System.out.println(r.url());
-            System.out.println(AopUtils.isJdkDynamicProxy(proxy));
             Class<?> target = AopUtils.getTargetClass(proxy);
             Method[] methods = target.getMethods();
             Map<String, IHttpMethod> proxyMethods = new HashMap<>();
