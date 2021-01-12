@@ -3,10 +3,12 @@ package com.github.arthas.config;
 import com.github.arthas.ArthasBeanPostProcessor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
+@ComponentScan(value = "com.github.arthas")
 public class ArthasConfig {
 
     @Bean
