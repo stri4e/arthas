@@ -4,7 +4,7 @@ import com.github.arthas.annotations.Body;
 import com.github.arthas.annotations.Header;
 import com.github.arthas.annotations.Path;
 import com.github.arthas.annotations.Query;
-import com.github.arthas.models.DynamicMetaInfo;
+import com.github.arthas.models.StaticMetaInfo;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.lang.annotation.Annotation;
@@ -19,9 +19,9 @@ import java.util.stream.Stream;
 
 public class ReflectParamsUtils {
 
-    public static URI uri(String baseUri, String pathPattern, DynamicMetaInfo dynamic, Object[] arguments) {
-        Map<String, Integer> paths = dynamic.getPaths();
-        Map<String, Integer> queries = dynamic.getQueries();
+    public static URI uri(String baseUri, String pathPattern, StaticMetaInfo methodMetaInfo, Object[] arguments) {
+        Map<String, Integer> paths = methodMetaInfo.getPaths();
+        Map<String, Integer> queries = methodMetaInfo.getQueries();
         return UriComponentsBuilder.fromUriString(baseUri)
                 .path(pathPattern)
                 .query(queries.entrySet().stream()

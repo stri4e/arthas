@@ -20,13 +20,31 @@ public final class StaticMetaInfo {
 
     private final Class<?> responseType;
 
-    public StaticMetaInfo(HttpMethodType httpMethodType, HttpMethod httpMethod, Map<String, String> staticHeaders, String pathPattern, Class<?> bodyType, Class<?> responseType) {
+    private final Map<String, Integer> headers;
+
+    private final Map<String, Integer> paths;
+
+    private final Map<String, Integer> queries;
+
+    private Integer bodyPosition = -1;
+
+    public StaticMetaInfo(HttpMethodType httpMethodType,
+                          HttpMethod httpMethod,
+                          Map<String, String> staticHeaders,
+                          String pathPattern,
+                          Class<?> bodyType, Class<?> responseType,
+                          Map<String, Integer> headers, Map<String, Integer> paths,
+                          Map<String, Integer> queries, Integer bodyPosition) {
         this.httpMethodType = httpMethodType;
         this.httpMethod = httpMethod;
         this.staticHeaders = staticHeaders;
         this.pathPattern = pathPattern;
         this.bodyType = bodyType;
         this.responseType = responseType;
+        this.headers = headers;
+        this.paths = paths;
+        this.queries = queries;
+        this.bodyPosition = bodyPosition;
     }
 
     public HttpMethodType getHttpMethodType() {
@@ -45,12 +63,28 @@ public final class StaticMetaInfo {
         return pathPattern;
     }
 
+    public Class<?> getBodyType() {
+        return bodyType;
+    }
+
     public Class<?> getResponseType() {
         return responseType;
     }
 
-    public Class<?> getBodyType() {
-        return bodyType;
+    public Map<String, Integer> getHeaders() {
+        return headers;
+    }
+
+    public Map<String, Integer> getPaths() {
+        return paths;
+    }
+
+    public Map<String, Integer> getQueries() {
+        return queries;
+    }
+
+    public Integer getBodyPosition() {
+        return bodyPosition;
     }
 
     @Override
@@ -63,12 +97,16 @@ public final class StaticMetaInfo {
                 Objects.equals(staticHeaders, that.staticHeaders) &&
                 Objects.equals(pathPattern, that.pathPattern) &&
                 Objects.equals(bodyType, that.bodyType) &&
-                Objects.equals(responseType, that.responseType);
+                Objects.equals(responseType, that.responseType) &&
+                Objects.equals(headers, that.headers) &&
+                Objects.equals(paths, that.paths) &&
+                Objects.equals(queries, that.queries) &&
+                Objects.equals(bodyPosition, that.bodyPosition);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(httpMethodType, httpMethod, staticHeaders, pathPattern, bodyType, responseType);
+        return Objects.hash(httpMethodType, httpMethod, staticHeaders, pathPattern, bodyType, responseType, headers, paths, queries, bodyPosition);
     }
 
     @Override
@@ -80,6 +118,10 @@ public final class StaticMetaInfo {
                 ", pathPattern='" + pathPattern + '\'' +
                 ", bodyType=" + bodyType +
                 ", responseType=" + responseType +
+                ", headers=" + headers +
+                ", paths=" + paths +
+                ", queries=" + queries +
+                ", bodyPosition=" + bodyPosition +
                 '}';
     }
 }

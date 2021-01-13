@@ -3,7 +3,7 @@ package com.github.arthas;
 import com.github.arthas.annotations.Arthas;
 import com.github.arthas.annotations.BaseMethod;
 import com.github.arthas.handlers.IHttpMethod;
-import com.github.arthas.http.AnnotationProcessor;
+import com.github.arthas.models.IStaticMetaInfoBuilder;
 import com.github.arthas.models.StaticMetaInfo;
 import org.springframework.aop.framework.Advised;
 import org.springframework.aop.framework.ProxyFactory;
@@ -12,13 +12,11 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.FatalBeanException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.util.ReflectionUtils;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 public class ArthasBeanPostProcessor implements BeanPostProcessor {
 
@@ -34,20 +32,29 @@ public class ArthasBeanPostProcessor implements BeanPostProcessor {
         Arthas r = AnnotationUtils.findAnnotation(bean.getClass(), Arthas.class);
         if (r != null) {
             Class<?> target = AopUtils.getTargetClass(proxy);
-            Method[] methods = target.getMethods();
+            Class<?>[] interfaces = target.getInterfaces();
+            Method[] methods = Arrays.stream(interfaces)
+                    .map(ReflectionUtils::getDeclaredMethods)
+                    .flatMap(Arrays::stream)
+                    .toArray(Method[]::new);
             Map<String, IHttpMethod> proxyMethods = new HashMap<>();
             Arrays.stream(methods).forEach(m -> {
-                BaseMethod btn = AnnotationUtils.findAnnotation(m, BaseMethod.class);
-                if (Objects.nonNull(btn)) {
-                    StaticMetaInfo i = AnnotationProcessor.staticMetaInfo(m, AnnotationProcessor.chooseAnnotation(btn.method()), btn.method());
+                BaseMethod bm = AnnotationUtils.findAnnotation(m, BaseMethod.class);
+                if (Objects.nonNull(bm)) {
+                    StaticMetaInfo i = IStaticMetaInfoBuilder.builder()
+                            .method(m)
+                            .httpMethod(bm.method())
+                            .annotation()
+                            .responseToFlux()
+                            .responseToMono()
+                            .responseToEmptyFlux()
+                            .responseToEmptyMono()
+                            .methodParams()
+                            .build();
                     proxyMethods.put(m.getName(), i.getHttpMethodType().choose(i));
                 }
             });
             return proxiedBean(bean, r.url(), proxyMethods);
-        }
-        Arthas annotation = AnnotationUtils.getAnnotation(proxy.getClass(), Arthas.class);
-        if (annotation != null) {
-            return bean;
         }
         return bean;
     }
