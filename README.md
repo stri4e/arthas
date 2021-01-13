@@ -1,5 +1,5 @@
 # arthas
-This is reactor http annotation client
+This is Bean Post Processor for Spring Boot WebClient
 
 Sorry for tests (1.0-SNAPSHOT). It's into next release. 
 
