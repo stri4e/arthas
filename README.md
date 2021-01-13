@@ -26,7 +26,7 @@ Example:
         @Post(path = "/{content}")
         @BodyToMono(clazz = Models.class)
         @ResponseToMono(clazz = Models.class)
-         Mono<Models> sendPostRequest(@Path(name = "content") String content, @Body Models payload);
+        Mono<Models> sendPostRequest(@Path(name = "content") String content, @Body Models payload);
 
     }
     
