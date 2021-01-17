@@ -5,22 +5,26 @@ import com.github.arthas.handlers.impl.*;
 import com.github.arthas.models.StaticMetaInfo;
 
 public enum HttpMethodType {
-    onlyMono, onlyFlux, monoWithoutBody, fluxWithoutBody, bodyMonoRespFlux, bodyFluxRespMono;
+    onlyMono, onlyFlux, monoWithoutBody, fluxWithoutBody, bodyMonoRespFlux, bodyFluxRespMono, ofFlux, ofMono;
 
     public IHttpMethod choose(StaticMetaInfo data) {
         switch (this) {
             case onlyMono:
-                return new OnlyMono(data);
+                return new OnlyMonoHttpMethodHandler(data);
             case onlyFlux:
-                return new OnlyFlux(data);
+                return new OnlyFluxHttpMethodHandler(data);
             case monoWithoutBody:
-                return new MonoWithoutBody(data);
+                return new MonoWithoutBodyHttpMethodHandler(data);
             case fluxWithoutBody:
-                return new FluxWithoutBody(data);
+                return new FluxWithoutBodyHttpMethodHandler(data);
             case bodyMonoRespFlux:
-                return new BodyMonoRespFlux(data);
+                return new BodyMonoRespFluxHttpMethodHandler(data);
             case bodyFluxRespMono:
-                return new BodyFluxRespMono(data);
+                return new BodyFluxRespMonoHttpMethodHandler(data);
+            case ofFlux:
+                return new FluxHttpMethodHandler(data);
+            case ofMono:
+                return new MonoHttpMethodHandler(data);
             default:
                 throw new RuntimeException("Can not choose method type u forgot somme meta info.");
         }

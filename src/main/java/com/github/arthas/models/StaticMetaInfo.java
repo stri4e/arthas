@@ -8,6 +8,8 @@ import java.util.Objects;
 
 public final class StaticMetaInfo {
 
+    private final String methodName;
+
     private final HttpMethodType httpMethodType;
 
     private final HttpMethod httpMethod;
@@ -28,13 +30,14 @@ public final class StaticMetaInfo {
 
     private Integer bodyPosition = -1;
 
-    public StaticMetaInfo(HttpMethodType httpMethodType,
+    public StaticMetaInfo(String methodName, HttpMethodType httpMethodType,
                           HttpMethod httpMethod,
                           Map<String, String> staticHeaders,
                           String pathPattern,
                           Class<?> bodyType, Class<?> responseType,
                           Map<String, Integer> headers, Map<String, Integer> paths,
                           Map<String, Integer> queries, Integer bodyPosition) {
+        this.methodName = methodName;
         this.httpMethodType = httpMethodType;
         this.httpMethod = httpMethod;
         this.staticHeaders = staticHeaders;
@@ -45,6 +48,10 @@ public final class StaticMetaInfo {
         this.paths = paths;
         this.queries = queries;
         this.bodyPosition = bodyPosition;
+    }
+
+    public String getMethodName() {
+        return methodName;
     }
 
     public HttpMethodType getHttpMethodType() {
@@ -92,7 +99,8 @@ public final class StaticMetaInfo {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         StaticMetaInfo that = (StaticMetaInfo) o;
-        return httpMethodType == that.httpMethodType &&
+        return Objects.equals(methodName, that.methodName) &&
+                httpMethodType == that.httpMethodType &&
                 httpMethod == that.httpMethod &&
                 Objects.equals(staticHeaders, that.staticHeaders) &&
                 Objects.equals(pathPattern, that.pathPattern) &&
@@ -106,13 +114,14 @@ public final class StaticMetaInfo {
 
     @Override
     public int hashCode() {
-        return Objects.hash(httpMethodType, httpMethod, staticHeaders, pathPattern, bodyType, responseType, headers, paths, queries, bodyPosition);
+        return Objects.hash(methodName, httpMethodType, httpMethod, staticHeaders, pathPattern, bodyType, responseType, headers, paths, queries, bodyPosition);
     }
 
     @Override
     public String toString() {
         return "StaticMetaInfo{" +
-                "httpMethodType=" + httpMethodType +
+                "methodName='" + methodName + '\'' +
+                ", httpMethodType=" + httpMethodType +
                 ", httpMethod=" + httpMethod +
                 ", staticHeaders=" + staticHeaders +
                 ", pathPattern='" + pathPattern + '\'' +

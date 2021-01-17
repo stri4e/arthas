@@ -1,7 +1,7 @@
 package com.github.arthas.handlers.impl;
 
 import com.github.arthas.handlers.IHttpMethod;
-import com.github.arthas.http.ProxyMethods;
+import com.github.arthas.http.ProxyMethodsDeclarations;
 import com.github.arthas.models.StaticMetaInfo;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -12,11 +12,11 @@ import java.util.stream.Collectors;
 
 import static com.github.arthas.utils.ReflectParamsUtils.uri;
 
-public final class BodyMonoRespFlux implements IHttpMethod {
+public final class OnlyMonoHttpMethodHandler implements IHttpMethod {
 
     private final StaticMetaInfo methodMetaInfo;
 
-    public BodyMonoRespFlux(StaticMetaInfo methodMetaInfo) {
+    public OnlyMonoHttpMethodHandler(StaticMetaInfo methodMetaInfo) {
         this.methodMetaInfo = methodMetaInfo;
     }
 
@@ -28,7 +28,7 @@ public final class BodyMonoRespFlux implements IHttpMethod {
                 .collect(Collectors.toMap(
                         Function.identity(), k -> (String) arguments[rawHeaders.get(k)])
                 ));
-        return ProxyMethods.bodyMonoRespFlux(
+        return ProxyMethodsDeclarations.onlyMono(
                 webClient,
                 arguments[this.methodMetaInfo.getBodyPosition()],
                 uri(

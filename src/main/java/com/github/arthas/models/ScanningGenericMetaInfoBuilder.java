@@ -2,12 +2,14 @@ package com.github.arthas.models;
 
 import com.github.arthas.HttpMethodType;
 import com.github.arthas.annotations.*;
+import com.github.arthas.utils.ReflectParamsUtils;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.http.HttpMethod;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
+import java.lang.reflect.*;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -16,7 +18,7 @@ import java.util.stream.Collectors;
 
 import static java.util.Objects.requireNonNull;
 
-public class DefaultMetaInfoBuilder implements IStaticMetaInfoBuilder {
+public class ScanningGenericMetaInfoBuilder implements IStaticMetaInfoBuilder {
 
     private Method method;
 
@@ -27,8 +29,6 @@ public class DefaultMetaInfoBuilder implements IStaticMetaInfoBuilder {
     private Map<String, String> staticHeaders;
 
     private Class<?> responseType;
-
-    private Class<?> bodyType;
 
     private HttpMethodType httpMethodType;
 
@@ -66,84 +66,40 @@ public class DefaultMetaInfoBuilder implements IStaticMetaInfoBuilder {
 
     @Override
     public IStaticMetaInfoBuilder responseTo() {
+        Class<?> r = this.method.getReturnType();
+        if (void.class.getName().equals(r.getName())) {
+            this.responseType = r;
+        } else {
+            if (Flux.class.getName().equals(r.getName())) {
+                this.responseType = (Class<?>) ReflectParamsUtils.fetchGenericType(this.method);
+                this.httpMethodType = HttpMethodType.ofFlux;
+            }else if (Mono.class.getName().equals(r.getName())) {
+                this.responseType = (Class<?>) ReflectParamsUtils.fetchGenericType(this.method);
+                this.httpMethodType = HttpMethodType.ofMono;
+            } else {
+                throw new RuntimeException("Can't not find Mono or Flux in return params. Method name: " + this.method.getName());
+            }
+        }
         return this;
     }
 
     @Override
     public IStaticMetaInfoBuilder responseToFlux() {
-        Annotation annResp;
-        Annotation annBody;
-        if ((annResp = AnnotationUtils.findAnnotation(this.method, ResponseToFlux.class)) != null) {
-            this.responseType = (Class<?>) AnnotationUtils.getAnnotationAttributes(requireNonNull(annResp)).get("clazz");
-            if ((annBody = AnnotationUtils.findAnnotation(this.method, BodyToMono.class)) != null) {
-                this.bodyType = (Class<?>) AnnotationUtils.getAnnotationAttributes(requireNonNull(annBody)).get("clazz");
-                this.httpMethodType = HttpMethodType.bodyMonoRespFlux;
-            } else if ((annBody = AnnotationUtils.findAnnotation(this.method, BodyToFlux.class)) != null) {
-                this.bodyType = (Class<?>) AnnotationUtils.getAnnotationAttributes(requireNonNull(annBody)).get("clazz");
-                this.httpMethodType = HttpMethodType.onlyFlux;
-            } else {
-                httpMethodType = HttpMethodType.fluxWithoutBody;
-                this.bodyType = Void.class;
-            }
-        }
         return this;
     }
 
     @Override
     public IStaticMetaInfoBuilder responseToMono() {
-        Annotation annResp;
-        Annotation annBody;
-        if ((annResp = AnnotationUtils.findAnnotation(this.method, ResponseToMono.class)) != null) {
-            this.responseType = (Class<?>) AnnotationUtils.getAnnotationAttributes(requireNonNull(annResp)).get("clazz");
-            if ((annBody = AnnotationUtils.findAnnotation(this.method, BodyToMono.class)) != null) {
-                this.bodyType = (Class<?>) AnnotationUtils.getAnnotationAttributes(requireNonNull(annBody)).get("clazz");
-                this.httpMethodType = HttpMethodType.onlyMono;
-            } else if ((annBody = AnnotationUtils.findAnnotation(this.method, BodyToFlux.class)) != null) {
-                this.bodyType = (Class<?>) AnnotationUtils.getAnnotationAttributes(requireNonNull(annBody)).get("clazz");
-                this.httpMethodType = HttpMethodType.bodyFluxRespMono;
-            } else {
-                this.bodyType = Void.class;
-                this.httpMethodType = HttpMethodType.monoWithoutBody;
-            }
-        }
         return this;
     }
 
     @Override
     public IStaticMetaInfoBuilder responseToEmptyFlux() {
-        Annotation annBody;
-        if (AnnotationUtils.findAnnotation(this.method, ResponseToEmptyFlux.class) != null) {
-            this.responseType = Void.class;
-            if ((annBody = AnnotationUtils.findAnnotation(this.method, BodyToMono.class)) != null) {
-                this.bodyType = (Class<?>) AnnotationUtils.getAnnotationAttributes(requireNonNull(annBody)).get("clazz");
-                this.httpMethodType = HttpMethodType.bodyMonoRespFlux;
-            } else if ((annBody = AnnotationUtils.findAnnotation(this.method, BodyToFlux.class)) != null) {
-                this.bodyType = (Class<?>) AnnotationUtils.getAnnotationAttributes(requireNonNull(annBody)).get("clazz");
-                this.httpMethodType = HttpMethodType.onlyFlux;
-            } else {
-                this.bodyType = Void.class;
-                this.httpMethodType = HttpMethodType.fluxWithoutBody;
-            }
-        }
         return this;
     }
 
     @Override
     public IStaticMetaInfoBuilder responseToEmptyMono() {
-        Annotation annBody;
-        if (AnnotationUtils.findAnnotation(this.method, ResponseToEmptyMono.class) != null) {
-            responseType = Void.class;
-            if ((annBody = AnnotationUtils.findAnnotation(this.method, BodyToMono.class)) != null) {
-                this.bodyType = (Class<?>) AnnotationUtils.getAnnotationAttributes(requireNonNull(annBody)).get("clazz");
-                this.httpMethodType = HttpMethodType.onlyMono;
-            } else if ((annBody = AnnotationUtils.findAnnotation(this.method, BodyToFlux.class)) != null) {
-                this.bodyType = (Class<?>) AnnotationUtils.getAnnotationAttributes(requireNonNull(annBody)).get("clazz");
-                this.httpMethodType = HttpMethodType.bodyFluxRespMono;
-            } else {
-                this.bodyType = Void.class;
-                this.httpMethodType = HttpMethodType.monoWithoutBody;
-            }
-        }
         return this;
     }
 
@@ -179,7 +135,7 @@ public class DefaultMetaInfoBuilder implements IStaticMetaInfoBuilder {
                 this.httpMethod,
                 Objects.isNull(this.staticHeaders) ? new HashMap<>() : this.staticHeaders,
                 this.pathPattern,
-                this.bodyType,
+                null,
                 this.responseType,
                 this.dynamicHeaders,
                 this.dynamicPaths,
@@ -210,5 +166,4 @@ public class DefaultMetaInfoBuilder implements IStaticMetaInfoBuilder {
                 throw new RuntimeException("Annotation exist in default scope.");
         }
     }
-
 }

@@ -12,6 +12,8 @@ public interface IStaticMetaInfoBuilder {
 
     IStaticMetaInfoBuilder annotation();
 
+    IStaticMetaInfoBuilder responseTo();
+
     IStaticMetaInfoBuilder responseToFlux();
 
     IStaticMetaInfoBuilder responseToMono();
@@ -26,6 +28,10 @@ public interface IStaticMetaInfoBuilder {
 
     static IStaticMetaInfoBuilder builder() {
         return new DefaultMetaInfoBuilder();
+    }
+
+    static IStaticMetaInfoBuilder scanningBuilder() {
+        return new ScanningGenericMetaInfoBuilder();
     }
 
 }
