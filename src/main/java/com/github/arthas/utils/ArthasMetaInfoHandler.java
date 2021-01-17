@@ -33,7 +33,6 @@ public class ArthasMetaInfoHandler {
                     .methodParams()
                     .build();
 
-
     private static final BiFunction<Method, HttpMethod, StaticMetaInfo> withoutAnnotations = (method, httpMethod) ->
             IStaticMetaInfoBuilder.scanningBuilder()
                     .method(method)
