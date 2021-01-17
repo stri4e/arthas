@@ -2,9 +2,12 @@ package com.github.arthas;
 
 import com.github.arthas.annotations.Arthas;
 import com.github.arthas.annotations.BaseMethod;
+import com.github.arthas.annotations.BodyToFlux;
+import com.github.arthas.annotations.BodyToMono;
 import com.github.arthas.handlers.IHttpMethod;
 import com.github.arthas.models.IStaticMetaInfoBuilder;
 import com.github.arthas.models.StaticMetaInfo;
+import com.github.arthas.utils.ArthasAnnotationUtils;
 import org.springframework.aop.framework.Advised;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.aop.support.AopUtils;
@@ -18,20 +21,32 @@ import org.springframework.web.reactive.function.client.WebClient;
 import java.lang.reflect.Method;
 import java.util.*;
 
-public class ArthasBeanPostProcessor implements BeanPostProcessor {
+import static com.github.arthas.utils.ArthasAnnotationUtils.isOnePresent;
+
+public class ArthasAnnotationBeanPostProcessor implements BeanPostProcessor {
 
     private final WebClient webClient;
 
-    public ArthasBeanPostProcessor(WebClient webClient) {
+    private final Map<String, Class<?>> arthasObjects = new HashMap<>();
+
+    public ArthasAnnotationBeanPostProcessor(WebClient webClient) {
         this.webClient = webClient;
     }
 
     @Override
+    public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+        Arthas arthas = AnnotationUtils.findAnnotation(bean.getClass(), Arthas.class);
+        if (Objects.nonNull(arthas)) {
+            this.arthasObjects.put(beanName, AopUtils.getTargetClass(bean));
+        }
+        return bean;
+    }
+
+    @Override
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-        Object proxy = this.getTargetObject(bean);
-        Arthas r = AnnotationUtils.findAnnotation(bean.getClass(), Arthas.class);
-        if (r != null) {
-            Class<?> target = AopUtils.getTargetClass(proxy);
+        Class<?> target = this.arthasObjects.get(beanName);
+        if (Objects.nonNull(target)) {
+            Arthas arthas = target.getAnnotation(Arthas.class);
             Class<?>[] interfaces = target.getInterfaces();
             Method[] methods = Arrays.stream(interfaces)
                     .map(ReflectionUtils::getDeclaredMethods)
@@ -41,20 +56,31 @@ public class ArthasBeanPostProcessor implements BeanPostProcessor {
             Arrays.stream(methods).forEach(m -> {
                 BaseMethod bm = AnnotationUtils.findAnnotation(m, BaseMethod.class);
                 if (Objects.nonNull(bm)) {
-                    StaticMetaInfo i = IStaticMetaInfoBuilder.builder()
-                            .method(m)
-                            .httpMethod(bm.method())
-                            .annotation()
-                            .responseToFlux()
-                            .responseToMono()
-                            .responseToEmptyFlux()
-                            .responseToEmptyMono()
-                            .methodParams()
-                            .build();
-                    proxyMethods.put(m.getName(), i.getHttpMethodType().choose(i));
+                    if (isOnePresent(m)) {
+                        StaticMetaInfo i = IStaticMetaInfoBuilder.builder()
+                                .method(m)
+                                .httpMethod(bm.method())
+                                .annotation()
+                                .responseToFlux()
+                                .responseToMono()
+                                .responseToEmptyFlux()
+                                .responseToEmptyMono()
+                                .methodParams()
+                                .build();
+                        proxyMethods.put(m.getName(), i.getHttpMethodType().choose(i));
+                    } else {
+                        StaticMetaInfo i = IStaticMetaInfoBuilder.scanningBuilder()
+                                .method(m)
+                                .httpMethod(bm.method())
+                                .annotation()
+                                .responseTo()
+                                .methodParams()
+                                .build();
+                        proxyMethods.put(m.getName(), i.getHttpMethodType().choose(i));
+                    }
                 }
             });
-            return proxiedBean(bean, r.url(), proxyMethods);
+            return proxiedBean(bean, arthas.url(), proxyMethods);
         }
         return bean;
     }

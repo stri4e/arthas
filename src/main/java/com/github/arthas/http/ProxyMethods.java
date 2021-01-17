@@ -8,6 +8,7 @@ import reactor.core.publisher.Mono;
 
 import java.net.URI;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Function;
 
 public class ProxyMethods {
@@ -68,6 +69,42 @@ public class ProxyMethods {
                 .body(Flux.just(body), ParameterizedTypeReference.forType(mi.getBodyType()))
                 .retrieve()
                 .bodyToMono(ParameterizedTypeReference.forType(mi.getResponseType()));
+    }
+
+    public static Function<StaticMetaInfo, Object> ofMono(WebClient webClient, Object body, URI uri, Map<String, String> headers) {
+        if (Objects.isNull(body)) {
+            return mi -> webClient
+                    .method(mi.getHttpMethod())
+                    .uri(uri)
+                    .headers(hs -> hs.setAll(headers))
+                    .retrieve()
+                    .bodyToMono(ParameterizedTypeReference.forType(mi.getResponseType()));
+        }
+        return mi -> webClient
+                .method(mi.getHttpMethod())
+                .uri(uri)
+                .headers(hs -> hs.setAll(headers))
+                .bodyValue(body)
+                .retrieve()
+                .bodyToMono(ParameterizedTypeReference.forType(mi.getResponseType()));
+    }
+
+    public static Function<StaticMetaInfo, Object> ofFlux(WebClient webClient, Object body, URI uri, Map<String, String> headers) {
+        if (Objects.isNull(body)) {
+            return mi -> webClient
+                    .method(mi.getHttpMethod())
+                    .uri(uri)
+                    .headers(hs -> hs.setAll(headers))
+                    .retrieve()
+                    .bodyToFlux(ParameterizedTypeReference.forType(mi.getResponseType()));
+        }
+        return mi -> webClient
+                .method(mi.getHttpMethod())
+                .uri(uri)
+                .headers(hs -> hs.setAll(headers))
+                .bodyValue(body)
+                .retrieve()
+                .bodyToFlux(ParameterizedTypeReference.forType(mi.getResponseType()));
     }
 
 }
