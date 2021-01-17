@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.Function;
 
-public class ProxyMethods {
+public class ProxyMethodsDeclarations {
 
     public static Function<StaticMetaInfo, Object> onlyMono(WebClient webClient, Object body, URI uri, Map<String, String> headers) {
         return mi -> webClient

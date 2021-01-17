@@ -3,10 +3,8 @@ package com.github.arthas.models;
 import com.github.arthas.HttpMethodType;
 import com.github.arthas.annotations.*;
 import com.github.arthas.utils.ReflectParamsUtils;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.http.HttpMethod;
-import org.springframework.util.ReflectionUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -132,6 +130,7 @@ public class ScanningGenericMetaInfoBuilder implements IStaticMetaInfoBuilder {
     @Override
     public StaticMetaInfo build() {
         return new StaticMetaInfo(
+                this.method.getName(),
                 this.httpMethodType,
                 this.httpMethod,
                 Objects.isNull(this.staticHeaders) ? new HashMap<>() : this.staticHeaders,

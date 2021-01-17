@@ -1,7 +1,7 @@
 package com.github.arthas.handlers.impl;
 
 import com.github.arthas.handlers.IHttpMethod;
-import com.github.arthas.http.ProxyMethods;
+import com.github.arthas.http.ProxyMethodsDeclarations;
 import com.github.arthas.models.StaticMetaInfo;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -12,11 +12,11 @@ import java.util.stream.Collectors;
 
 import static com.github.arthas.utils.ReflectParamsUtils.uri;
 
-public final class FluxWithoutBody implements IHttpMethod {
+public class MonoHttpMethodHandler implements IHttpMethod {
 
     private final StaticMetaInfo methodMetaInfo;
 
-    public FluxWithoutBody(StaticMetaInfo methodMetaInfo) {
+    public MonoHttpMethodHandler(StaticMetaInfo methodMetaInfo) {
         this.methodMetaInfo = methodMetaInfo;
     }
 
@@ -28,8 +28,9 @@ public final class FluxWithoutBody implements IHttpMethod {
                 .collect(Collectors.toMap(
                         Function.identity(), k -> (String) arguments[rawHeaders.get(k)])
                 ));
-        return ProxyMethods.fluxWithoutBody(
+        return ProxyMethodsDeclarations.ofMono(
                 webClient,
+                this.methodMetaInfo.getBodyPosition() == -1 ? null : arguments[this.methodMetaInfo.getBodyPosition()],
                 uri(
                         baseUri,
                         this.methodMetaInfo.getPathPattern(),
@@ -39,5 +40,4 @@ public final class FluxWithoutBody implements IHttpMethod {
                 headers
         ).apply(this.methodMetaInfo);
     }
-
 }
