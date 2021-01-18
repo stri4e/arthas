@@ -1,7 +1,6 @@
 package com.github.arthas.config;
 
 import com.github.arthas.ArthasAnnotationBeanPostProcessor;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnCloudPlatform;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.cloud.client.ConditionalOnDiscoveryHealthIndicatorEnabled;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
