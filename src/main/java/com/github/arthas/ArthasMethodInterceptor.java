@@ -28,7 +28,7 @@ public class ArthasMethodInterceptor implements MethodInterceptor {
         Method method = invocation.getMethod();
         Object[] arguments = invocation.getArguments();
         Parameter[] params = method.getParameters();
-        return this.proxyMethods.get(method.getName())
+        return this.proxyMethods.get(method.toString())
                 .method(this.webClient, this.url, arguments, params);
     }
 
