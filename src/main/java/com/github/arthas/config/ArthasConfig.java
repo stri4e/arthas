@@ -1,7 +1,10 @@
 package com.github.arthas.config;
 
 import com.github.arthas.ArthasAnnotationBeanPostProcessor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.cloud.client.ConditionalOnDiscoveryEnabled;
 import org.springframework.cloud.client.ConditionalOnDiscoveryHealthIndicatorEnabled;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.cloud.client.loadbalancer.reactive.ReactorLoadBalancerExchangeFilterFunction;
@@ -22,7 +25,7 @@ public class ArthasConfig {
     @Bean
     @Order(value = 0)
     @LoadBalanced
-    @ConditionalOnDiscoveryHealthIndicatorEnabled
+    @ConditionalOnExpression(value = "${arthas.eureka.enable:true}")
     public WebClient webClientWithLoadBalanced() {
         return WebClient.builder()
                 .filter(this.lbFunction)
