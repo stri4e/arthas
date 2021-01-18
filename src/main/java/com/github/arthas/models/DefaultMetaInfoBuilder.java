@@ -174,7 +174,7 @@ public class DefaultMetaInfoBuilder implements IStaticMetaInfoBuilder {
     @Override
     public StaticMetaInfo build() {
         return new StaticMetaInfo(
-                this.method.getName(),
+                this.method.toString(),
                 this.httpMethodType,
                 this.httpMethod,
                 Objects.isNull(this.staticHeaders) ? new HashMap<>() : this.staticHeaders,
