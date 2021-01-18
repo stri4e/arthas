@@ -27,6 +27,7 @@ public class ArthasConfig {
     @Bean
     @Order(value = 0)
     @LoadBalanced
+    @ConditionalOnMissingBean(WebClient.class)
     @Conditional(value = ArthasEurekaClientCondition.class)
     public WebClient webClientWithLoadBalanced() {
         return WebClient.builder()
