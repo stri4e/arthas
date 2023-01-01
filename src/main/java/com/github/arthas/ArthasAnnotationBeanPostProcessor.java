@@ -8,6 +8,8 @@ import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.beans.factory.config.DestructionAwareBeanPostProcessor;
+import org.springframework.boot.context.properties.ConfigurationPropertiesBindingPostProcessor;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.ReflectionUtils;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -16,7 +18,7 @@ import java.lang.reflect.Method;
 import java.util.*;
 import static java.util.stream.Collectors.toMap;
 
-public class ArthasAnnotationBeanPostProcessor implements BeanPostProcessor {
+public class ArthasAnnotationBeanPostProcessor implements BeanPostProcessor, DestructionAwareBeanPostProcessor {
 
     private final WebClient webClient;
 
@@ -67,4 +69,8 @@ public class ArthasAnnotationBeanPostProcessor implements BeanPostProcessor {
         return proxyFactory.getProxy();
     }
 
+    @Override
+    public void postProcessBeforeDestruction(Object bean, String beanName) throws BeansException {
+        System.out.println("Destroy bean " + beanName);
+    }
 }

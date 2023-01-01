@@ -1,7 +1,7 @@
 plugins {
-    id 'org.springframework.boot' version '2.4.1'
-    id 'io.spring.dependency-management' version '1.0.10.RELEASE'
     id 'java'
+    id 'org.springframework.boot' version '2.7.7'
+    id 'io.spring.dependency-management' version '1.1.0'
 }
 
 group = 'com.github'
@@ -41,6 +41,7 @@ dependencies {
     implementation group: 'org.reflections', name: 'reflections', version: '0.9.12'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'io.projectreactor:reactor-test'
+    testImplementation group: 'junit', name: 'junit', version: '4.13.2'
 }
 
 dependencyManagement {

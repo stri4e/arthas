@@ -2,13 +2,9 @@ package com.github.arthas.config;
 
 import com.github.arthas.ArthasAnnotationBeanPostProcessor;
 import com.github.arthas.condition.ArthasEurekaClientCondition;
-import org.springframework.boot.autoconfigure.condition.*;
-import org.springframework.cloud.client.ConditionalOnDiscoveryEnabled;
-import org.springframework.cloud.client.ConditionalOnDiscoveryHealthIndicatorEnabled;
-import org.springframework.cloud.client.ConditionalOnReactiveDiscoveryEnabled;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.cloud.client.loadbalancer.reactive.ReactorLoadBalancerExchangeFilterFunction;
-import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Conditional;
 import org.springframework.context.annotation.Configuration;
