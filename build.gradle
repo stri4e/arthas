@@ -1,55 +1,22 @@
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '2.7.7'
-    id 'io.spring.dependency-management' version '1.1.0'
 }
 
-group = 'com.github'
-version = '0.0.9'
 sourceCompatibility = '11'
+targetCompatibility = '11'
 
-configurations {
-    compileOnly {
-        extendsFrom annotationProcessor
+
+allprojects {
+
+    group = 'com.github'
+    version = '0.0.9'
+
+    repositories {
+        mavenCentral()
     }
-}
 
-bootJar {
-    enabled = false
-}
-
-jar {
-    enabled = true
-}
-
-repositories {
-    mavenCentral()
-}
-
-repositories {
-    mavenCentral()
-    maven { url 'https://repo.spring.io/milestone' }
-}
-
-ext {
-    set('springCloudVersion', "2020.0.0")
-}
-
-dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-webflux'
-    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
-    implementation group: 'org.reflections', name: 'reflections', version: '0.9.12'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'io.projectreactor:reactor-test'
-    testImplementation group: 'junit', name: 'junit', version: '4.13.2'
-}
-
-dependencyManagement {
-    imports {
-        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    test {
+        useJUnitPlatform()
     }
-}
 
-test {
-    useJUnitPlatform()
 }
