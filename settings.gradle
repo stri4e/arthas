@@ -1,3 +1,4 @@
-rootProject.name = 'arthas'
-include 'processor'
+rootProject.name = 'spring-boot-starter-arthas'
+include 'processor', 'arthas-spring-boot-autoconfiguration'
 
+//rootProject.children.each { it.projectDir = new File(settingsDir, sprintf("../%s", it.name)) }

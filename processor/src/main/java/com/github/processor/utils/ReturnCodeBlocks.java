@@ -19,8 +19,8 @@ public class ReturnCodeBlocks {
         return new ReturnCodeBlocks();
     }
 
-    public ReturnCodeBlocks returnCodeBlock() {
-        this.returnStatement.add(CodeBlock.of("return this.client.post()"));
+    public ReturnCodeBlocks returnCodeBlock(String method) {
+        this.returnStatement.add(CodeBlock.of("return this.client.$N", method));
         return this;
     }
 

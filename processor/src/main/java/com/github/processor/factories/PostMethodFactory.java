@@ -67,7 +67,7 @@ public class PostMethodFactory implements RESTMethodsFactory {
                 methodSpecBuilder.addStatement(uriComponentsCode);
 
                 methodSpecBuilder.addStatement(ReturnCodeBlocks.builder()
-                        .returnCodeBlock()
+                        .returnCodeBlock("post()")
                         .uriCodeBlock()
                         .bodyCodeBlock(parameters)
                         .httpAttributesCodeBlock(httpAttributes)

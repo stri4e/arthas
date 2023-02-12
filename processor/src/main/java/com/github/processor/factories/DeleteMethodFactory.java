@@ -65,7 +65,7 @@ public class DeleteMethodFactory implements RESTMethodsFactory {
                 methodSpecBuilder.addStatement(uriComponentsCode);
 
                 methodSpecBuilder.addStatement(ReturnCodeBlocks.builder()
-                        .returnCodeBlock()
+                        .returnCodeBlock("delete()")
                         .uriCodeBlock()
                         .httpAttributesCodeBlock(httpAttributes)
                         .httpHeadersCodeBlock(httpHeaders)

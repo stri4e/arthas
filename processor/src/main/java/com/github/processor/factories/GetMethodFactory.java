@@ -118,7 +118,7 @@ public class GetMethodFactory implements RESTMethodsFactory {
                 methodSpecBuilder.addStatement(uriComponentsCode);
 
                 methodSpecBuilder.addStatement(ReturnCodeBlocks.builder()
-                        .returnCodeBlock()
+                        .returnCodeBlock("get()")
                         .uriCodeBlock()
                         .httpAttributesCodeBlock(httpAttributes)
                         .httpHeadersCodeBlock(httpHeaders)

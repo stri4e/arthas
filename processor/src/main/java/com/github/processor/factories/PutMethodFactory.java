@@ -63,7 +63,7 @@ public class PutMethodFactory implements RESTMethodsFactory {
                 methodSpecBuilder.addStatement(uriComponentsCode);
 
                 methodSpecBuilder.addStatement(ReturnCodeBlocks.builder()
-                        .returnCodeBlock()
+                        .returnCodeBlock("get()")
                         .uriCodeBlock()
                         .bodyCodeBlock(parameters)
                         .httpAttributesCodeBlock(httpAttributes)
