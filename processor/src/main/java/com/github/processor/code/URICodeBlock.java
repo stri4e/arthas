@@ -19,7 +19,7 @@ import java.util.Optional;
 public class URICodeBlock {
 
     public static CodeBlock uriBuilder() {
-        return CodeBlock.of("$T uri = $T.newInstance().uri(baseUri)", URI.class, SpringTypeSpecifications.uriComponentsBuilder());
+        return CodeBlock.of("$T uri = $T.newInstance().uri(this.baseUri)", URI.class, SpringTypeSpecifications.uriComponentsBuilder());
     }
 
     public static CodeBlock uri() {

@@ -35,55 +35,6 @@ public class GetMethodFactory implements RESTMethodsFactory {
             List<? extends VariableElement> parameters = methodExecutableElement.getParameters();
             if (methodReturnType instanceof DeclaredType) {
 
-                List<AnnotationPair> y = parameters.stream()
-                        .map(param -> {
-                            String parameterName = param.getSimpleName().toString();
-                            ParamEmulator requestParam = new ParamEmulator(param, ParamEmulator.PATH_VARIABLE);
-                            if (requestParam.isAnnotationExist()) {
-                                String name = requestParam.name();
-                                String annotationParameterName = StringUtils.isNoneBlank(name) ? name : requestParam.value();
-                                if (StringUtils.isBlank(annotationParameterName)) {
-                                    annotationParameterName = parameterName;
-                                }
-                                return new AnnotationPair(annotationParameterName, parameterName);
-                            }
-                            return null;
-                        }).filter(Objects::nonNull).collect(Collectors.toList());
-
-                Map<String, List<String>> mappers = new HashMap<>();
-                for (int i = 0; i < paths.size(); i++) {
-                    String path = paths.get(i);
-                    List<String> args = new LinkedList<>();
-                    for (int j = 0; j < y.size(); j++) {
-                        AnnotationPair tmp = y.get(j);
-                        if (path.contains(tmp.getKey())) {
-                            args.add(tmp.getValue());
-                        }
-                    }
-                    mappers.put(path, args);
-                }
-
-                CodeBlock.Builder c = CodeBlock.builder()
-                        .addStatement("$T path = \"\"", ClassName.get(String.class));
-                int count = 0;
-                for (String key : mappers.keySet()) {
-                    List<String> values = mappers.get(key);
-                    List<CodeBlock> cbs = new LinkedList<>();
-                    for (String value : values) {
-                        cbs.add(CodeBlock.builder()
-                                .add("$T.nonNull($L)", ClassName.get(Objects.class), value)
-                                .build());
-                    }
-                    if (count++ == 0) {
-                        c.beginControlFlow("if ($L)", CodeBlock.join(cbs, " && "))
-                                .addStatement("path = $S", key);
-                    } else {
-                        c.nextControlFlow("else if ($L)", CodeBlock.join(cbs, " && "))
-                                .addStatement("path = $S", key);
-                    }
-                }
-                CodeBlock controlFlow = c.endControlFlow().build();
-
                 ParameterizedTypeName typeHashMap = ParameterizedTypeName.get(HashMap.class, String.class, Object.class);
                 ParameterizedTypeName variableMap = ParameterizedTypeName.get(Map.class, String.class, Object.class);
 
@@ -105,10 +56,6 @@ public class GetMethodFactory implements RESTMethodsFactory {
                         .addAnnotation(Override.class)
                         .addParameters(convertedParameters)
                         .returns(ParameterizedTypeName.get(declaredMethodReturnType));
-
-                if (paths.size() > 1) {
-                    methodSpecBuilder.addCode(controlFlow);
-                }
 
                 if (!parameterOfHttpPath.isEmpty()) {
                     methodSpecBuilder.addStatement(CodeBlock.of("$T parameters = new $T()", variableMap, typeHashMap));
