@@ -2,6 +2,7 @@ package com.github.processor.factories;
 
 import com.github.processor.annotations.Arthas;
 import com.github.processor.utils.SpringTypeSpecifications;
+import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.MethodSpec;
 import org.apache.commons.lang3.StringUtils;
 
@@ -14,7 +15,8 @@ public class ConstructorFactory {
         return MethodSpec.constructorBuilder()
                 .addModifiers(Modifier.PUBLIC)
                 .addParameter(SpringTypeSpecifications.webClientBuilder(), "clientBuilder")
-                .addStatement(String.format("this.client = clientBuilder.baseUrl(\"%s\").build()", url))
+                .addStatement("this.client = clientBuilder.build()")
+                .addStatement(CodeBlock.of("this.baseUri = URI.create($S)", url))
                 .build();
     }
 

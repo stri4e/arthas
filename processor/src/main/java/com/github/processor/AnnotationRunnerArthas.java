@@ -16,6 +16,7 @@ import javax.lang.model.element.Modifier;
 import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import java.io.IOException;
+import java.net.URI;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -57,12 +58,18 @@ public class AnnotationRunnerArthas extends AbstractProcessor {
                     .addModifiers(Modifier.PRIVATE, Modifier.FINAL)
                     .addModifiers()
                     .build();
+            FieldSpec baseUri = FieldSpec
+                    .builder(URI.class, "baseUri")
+                    .addModifiers(Modifier.PRIVATE, Modifier.FINAL)
+                    .addModifiers()
+                    .build();
             TypeSpec requestService = TypeSpec
                     .classBuilder(String.format("%sImpl", element.getSimpleName()))
                     .addSuperinterface(element.asType())
                     .addAnnotation(SpringAnnotationSpecifications.component())
                     .addModifiers(Modifier.PUBLIC)
                     .addField(webClient)
+                    .addField(baseUri)
                     .addMethod(ConstructorFactory.constructor(annotation))
                     .addMethods(methodsToCreation)
                     .build();
